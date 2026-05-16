@@ -62,6 +62,7 @@ const map = new mapboxgl.Map({
     console.error('Error loading JSON:', error);
     return;
   }
+  console.log('First station:', stations[0]);
 
   const circles = svg
     .selectAll('circle')
