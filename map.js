@@ -1,4 +1,6 @@
 import mapboxgl from 'https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/+esm';
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+
 console.log('Mapbox GL JS Loaded:', mapboxgl);
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYWJieW1jbGVvZCIsImEiOiJjbXA3b2Z4M3owOW9wMnBwdnNmbjdkdjd0In0.PyN5jWfi1IqxwIVHPy-frQ';
@@ -16,6 +18,14 @@ const map = new mapboxgl.Map({
     'line-width': 5,
     'line-opacity': 0.6,
   };
+
+  const svg = d3.select('#map').select('svg');
+
+  function getCoords(station) {
+    const point = new mapboxgl.LngLat(+station.Long, +station.Lat);
+    const { x, y } = map.project(point);
+    return { cx: x, cy: y };
+  }
   
   map.on('load', async () => {
     map.addSource('boston_route', {
@@ -41,4 +51,39 @@ const map = new mapboxgl.Map({
       source: 'cambridge_route',
       paint: bikeLanePaint,
     });
-  });
+
+  let stations;
+  try {
+    const jsonData = await d3.json('https://dsc106.com/labs/lab07/data/bluebikes-stations.json');
+    console.log('Loaded JSON Data:', jsonData);
+    stations = jsonData.data.stations;
+    console.log('Stations Array:', stations);
+  } catch (error) {
+    console.error('Error loading JSON:', error);
+    return;
+  }
+
+  const circles = svg
+    .selectAll('circle')
+    .data(stations)
+    .enter()
+    .append('circle')
+    .attr('r', 5)
+    .attr('fill', 'steelblue')
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
+    .attr('opacity', 0.8);
+
+  function updatePositions() {
+    circles
+      .attr('cx', (d) => getCoords(d).cx)
+      .attr('cy', (d) => getCoords(d).cy);
+  }
+
+  updatePositions();
+
+  map.on('move', updatePositions);
+  map.on('zoom', updatePositions);
+  map.on('resize', updatePositions);
+  map.on('moveend', updatePositions);
+});
