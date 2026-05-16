@@ -54,7 +54,7 @@ const map = new mapboxgl.Map({
 
   let stations;
   try {
-    const jsonData = await d3.json('https://dsc106.com/labs/lab07/data/bluebikes-stations.json');
+    const jsonData = await d3.json('bluebikes-stations.json');
     console.log('Loaded JSON Data:', jsonData);
     stations = jsonData.data.stations;
     console.log('Stations Array:', stations);
