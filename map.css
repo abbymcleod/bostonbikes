@@ -23,3 +23,8 @@ body {
   height: 100%;
   pointer-events: none;
 }
+
+#map svg circle {
+    fill-opacity: 0.6;
+    pointer-events: auto;
+  }
