@@ -28,3 +28,38 @@ body {
     fill-opacity: 0.6;
     pointer-events: auto;
   }
+
+#map svg circle,
+.legend > div {
+  --color-departures: steelblue;
+  --color-arrivals: darkorange;
+  --color: color-mix(
+    in oklch,
+    var(--color-departures) calc(100% * var(--departure-ratio)),
+    var(--color-arrivals)
+  );
+}
+
+#map svg circle {
+  fill: var(--color);
+  fill-opacity: 0.6;
+  pointer-events: auto;
+}
+
+.legend {
+  display: flex;
+  gap: 1px;
+  margin-block: 1em;
+}
+
+.legend > div {
+  flex: 1;
+  background: var(--color);
+  padding: 0.4em 1em;
+  font-size: 0.85em;
+  color: white;
+}
+
+.legend > div:first-child { text-align: left; }
+.legend > div:nth-child(2) { text-align: center; }
+.legend > div:last-child { text-align: right; }

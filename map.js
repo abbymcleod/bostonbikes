@@ -79,6 +79,8 @@ const map = new mapboxgl.Map({
       return station;
     });
   }
+
+  const stationFlow = d3.scaleQuantize().domain([0, 1]).range([0, 0.5, 1]);
   
   map.on('load', async () => {
     // --- Bike lanes ---
@@ -149,18 +151,19 @@ const map = new mapboxgl.Map({
   
     // --- Draw circles ---
     const circles = svg
-      .selectAll('circle')
-      .data(stations, (d) => d.short_name)
-      .enter()
-      .append('circle')
-      .attr('fill', 'steelblue')
-      .attr('stroke', 'white')
-      .attr('stroke-width', 1)
-      .each(function (d) {
-        d3.select(this)
-          .append('title')
-          .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
-      });
+        .selectAll('circle')
+        .data(stations, (d) => d.short_name)
+        .enter()
+        .append('circle')
+        .attr('fill', 'steelblue')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 1)
+        .style('--departure-ratio', (d) => stationFlow(d.departures / d.totalTraffic))
+        .each(function (d) {
+            d3.select(this)
+            .append('title')
+            .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+        });
   
     // --- Position update ---
     function updatePositions() {
@@ -178,13 +181,14 @@ const map = new mapboxgl.Map({
   
     // --- Scatter plot update ---
     function updateScatterPlot(timeFilter) {
-      const filteredStations = computeStationTraffic(stations, timeFilter);
-      timeFilter === -1 ? radiusScale.range([0, 25]) : radiusScale.range([3, 50]);
-      circles
-        .data(filteredStations, (d) => d.short_name)
-        .join('circle')
-        .attr('r', (d) => radiusScale(d.totalTraffic));
-    }
+        const filteredStations = computeStationTraffic(stations, timeFilter);
+        timeFilter === -1 ? radiusScale.range([0, 25]) : radiusScale.range([3, 50]);
+        circles
+          .data(filteredStations, (d) => d.short_name)
+          .join('circle')
+          .attr('r', (d) => radiusScale(d.totalTraffic))
+          .style('--departure-ratio', (d) => stationFlow(d.departures / d.totalTraffic));
+      }
   
     // --- Slider ---
     const timeSlider = document.getElementById('time-slider');
