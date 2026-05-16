@@ -14,7 +14,15 @@
     <script src="map.js" type="module"></script>
   </head>
   <body>
-    <h1>🚴🏼‍♀️ Boston Blue Bikes</h1>
+    <header style="display: flex; gap: 1em; align-items: baseline;">
+      <h1>🚴🏼‍♀️ Boston Blue Bikes</h1>
+      <label style="margin-left: auto;">
+        Filter by time:
+        <input type="range" id="time-slider" min="-1" max="1440" value="-1" />
+        <time id="selected-time" style="display: block;"></time>
+        <em id="any-time" style="display: block; color: #aaa;">(any time)</em>
+      </label>
+    </header>
     <div id="map">
       <svg></svg>
     </div>
